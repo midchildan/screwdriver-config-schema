@@ -31,7 +31,7 @@ in
     description = "Generate Screwdriver schema files";
     exec = ''
       cd "$DEVENV_ROOT/src"
-      node index.js | sed 's|\\w-\.|\\w.-|g' > screwdriver.schema.json"
+      node index.js | sed 's|\\w-\.|\\w.-|g' > screwdriver.schema.json
       json-schema-to-nickel screwdriver.schema.json > screwdriver.schema.ncl
     '';
   };
