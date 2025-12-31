@@ -1,0 +1,11 @@
+stages:
+      description: For canary deployment
+      jobs: [main]
+jobs:
+    main:
+        template: mynamespace/mytemplate@1.2.3
+        environment:
+            FOO: 'overwritten by job'
+        requires:
+            - ~pr
+            - ~commit

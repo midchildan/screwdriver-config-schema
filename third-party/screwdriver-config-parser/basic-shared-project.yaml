@@ -1,0 +1,37 @@
+shared:
+    image: node:4
+    steps:
+        - hostname
+    environment:
+        FOO: bar
+    matrix:
+        VERSION: [1,2]
+        DIRECTORY: [a,b]
+    secrets:
+        - GIT_KEY
+    settings:
+        email: foo@example.com
+jobs:
+    main:
+        image: node:4
+        steps:
+            - install: npm install
+            - test: npm test
+            - publish: npm publish
+        environment:
+            BAR: foo
+        matrix:
+            DIRECTORY: [c,d]
+        settings:
+            hipchat: room_a
+        requires:
+            - ~pr
+            - ~commit
+    foobar:
+        environment:
+            BAZ: foo
+            FOO: ban
+        secrets:
+            - NPM_TOKEN
+        requires:
+            - main

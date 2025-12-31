@@ -1,0 +1,3 @@
+if has("nvim") && !&exrc
+  source <script>:h/.nvim.lua
+endif

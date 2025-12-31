@@ -1,0 +1,3100 @@
+{
+  "type": "object",
+  "properties": {
+    "template": {
+      "type": "string",
+      "pattern": "^([\\w-]+)\\/([\\w/-]+)(?:@((?:(?:\\d+)(?:\\.\\d+)?(?:\\.\\d+)?)|(?:[a-zA-Z][\\w-]+)))?$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50
+    },
+    "annotations": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "jobs": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$": {
+          "type": "object",
+          "default": {},
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": true
+            },
+            "blockedBy": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^~([\\w-]+)$"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^~([\\w-]+)$"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                    }
+                  ]
+                }
+              ]
+            },
+            "cache": {
+              "type": "boolean"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "environment": {
+              "type": "object",
+              "properties": {
+                "/^[A-Z_][A-Z0-9_]*$/": {
+                  "type": [
+                    "array",
+                    "boolean",
+                    "number",
+                    "object",
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[A-Z_][A-Z0-9_]*$": {
+                  "type": [
+                    "array",
+                    "boolean",
+                    "number",
+                    "object",
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "freezeWindows": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "image": {
+              "type": "string",
+              "pattern": "^[^;&|><*?`$()!#'\" ]+$"
+            },
+            "matrix": {
+              "type": "object",
+              "properties": {
+                "/^[A-Z_][A-Z0-9_]*$/": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[A-Z_][A-Z0-9_]*$": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            },
+            "order": {
+              "type": "array",
+              "minItems": 0,
+              "items": {
+                "type": "string",
+                "pattern": "^[\\w-]+$"
+              }
+            },
+            "parameters": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": true
+            },
+            "provider": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "examples": [
+                        "aws"
+                      ],
+                      "description": "Provider name",
+                      "maxLength": 64,
+                      "const": "aws"
+                    },
+                    "region": {
+                      "type": "string",
+                      "examples": [
+                        "us-west-2"
+                      ],
+                      "description": "Region where service and build will run, build region can be overridden",
+                      "default": "us-west-2",
+                      "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                      "maxLength": 64
+                    },
+                    "buildRegion": {
+                      "type": "string",
+                      "examples": [
+                        "us-east-2"
+                      ],
+                      "description": "Region where builds will run if different from service region",
+                      "default": "",
+                      "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                      "maxLength": 64
+                    },
+                    "accountId": {
+                      "examples": [
+                        "123456789012"
+                      ],
+                      "description": "Account ID",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9]{12}$",
+                          "maxLength": 12
+                        },
+                        {
+                          "type": "integer",
+                          "minimum": 12
+                        }
+                      ]
+                    },
+                    "vpc": {
+                      "type": "object",
+                      "properties": {
+                        "vpcId": {
+                          "type": "string",
+                          "examples": [
+                            "vpc-1a2b3c4d"
+                          ],
+                          "description": "VPC ID",
+                          "pattern": "^vpc-[\\w]+$",
+                          "maxLength": 128
+                        },
+                        "securityGroupIds": {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "string",
+                            "examples": [
+                              "sg-51530134"
+                            ],
+                            "description": "Security group ID",
+                            "pattern": "^sg-[\\w]+$",
+                            "maxLength": 128
+                          }
+                        },
+                        "subnetIds": {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "string",
+                            "examples": [
+                              "subnet-01234567890abcdef"
+                            ],
+                            "description": "Subnet ID",
+                            "pattern": "^subnet-[\\w]+$",
+                            "maxLength": 128
+                          }
+                        }
+                      },
+                      "required": [
+                        "vpcId",
+                        "securityGroupIds",
+                        "subnetIds"
+                      ],
+                      "additionalProperties": true
+                    },
+                    "role": {
+                      "type": "string",
+                      "examples": [
+                        "arn:aws:iam::123456789012:role/aws-service-role/amazonaws.com/AWSServiceRole"
+                      ],
+                      "description": "Role ARN",
+                      "pattern": "^arn:aws:iam::\\d{12}:role\\/.+",
+                      "maxLength": 512
+                    },
+                    "executor": {
+                      "type": "string",
+                      "examples": [
+                        "eks"
+                      ],
+                      "description": "Executor name",
+                      "enum": [
+                        "sls",
+                        "eks"
+                      ],
+                      "maxLength": 64
+                    },
+                    "clusterName": {
+                      "type": "string",
+                      "examples": [
+                        "sd-build-eks"
+                      ],
+                      "description": "Cluster name required if executor is eks",
+                      "maxLength": 128
+                    },
+                    "cpuLimit": {
+                      "type": "string",
+                      "examples": [
+                        "2Gi"
+                      ],
+                      "description": "CPU Limit for pod in EKS Cluster",
+                      "maxLength": 4
+                    },
+                    "memoryLimit": {
+                      "type": "string",
+                      "examples": [
+                        "4Gi"
+                      ],
+                      "description": "Memory Limit for pod in EKS Cluster",
+                      "maxLength": 4
+                    },
+                    "executorLogs": {
+                      "type": "boolean",
+                      "description": "Enable debug logs for executor codebuild",
+                      "default": false
+                    },
+                    "launcherImage": {
+                      "type": "string",
+                      "examples": [
+                        "123456789012.dkr.ecr.us-east-2.amazonaws.com/screwdriver-hub:launcherv6.4"
+                      ],
+                      "description": "Screwdriver launcher image in user Registry"
+                    },
+                    "launcherVersion": {
+                      "type": "string",
+                      "examples": [
+                        "v6.4"
+                      ],
+                      "description": "Screwdriver launcher version"
+                    },
+                    "privilegedMode": {
+                      "type": "boolean",
+                      "description": "Enable privileged mode for container",
+                      "default": false
+                    },
+                    "computeType": {
+                      "type": "string",
+                      "description": "CodeBuild compute type",
+                      "default": "BUILD_GENERAL1_SMALL",
+                      "enum": [
+                        "BUILD_GENERAL1_SMALL",
+                        "BUILD_GENERAL1_LARGE",
+                        "BUILD_GENERAL1_MEDIUM",
+                        "BUILD_GENERAL1_2XLARGE"
+                      ]
+                    },
+                    "environmentType": {
+                      "type": "string",
+                      "description": "CodeBuild environment type",
+                      "default": "LINUX_CONTAINER",
+                      "enum": [
+                        "ARM_CONTAINER",
+                        "LINUX_CONTAINER",
+                        "LINUX_GPU_CONTAINER"
+                      ]
+                    },
+                    "debugSession": {
+                      "type": "boolean",
+                      "description": "Enable debug session inside build container",
+                      "default": false
+                    }
+                  },
+                  "additionalProperties": true
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$"
+                }
+              ]
+            },
+            "requires": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^~([\\w-]+)$"
+                      },
+                      {
+                        "type": "string",
+                        "maxLength": 100,
+                        "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^~([\\w-]+)$"
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 100,
+                      "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                    }
+                  ]
+                }
+              ]
+            },
+            "secrets": {
+              "type": "array",
+              "minItems": 0,
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z_][A-Z0-9_]*$",
+                "maxLength": 64
+              }
+            },
+            "settings": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": true
+            },
+            "sourcePaths": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                {
+                  "type": "string",
+                  "maxLength": 1024
+                }
+              ]
+            },
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "/^[\\w-]+$/": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "command": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "command"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false,
+                    "patternProperties": {
+                      "^[\\w-]+$": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "command": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "command"
+                            ],
+                            "additionalProperties": true
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "template": {
+              "type": "string",
+              "pattern": "^([\\w/-]+)(?:@((?:(?:\\d+)(?:\\.\\d+)?(?:\\.\\d+)?)|(?:[a-zA-Z][\\w.-]+)))?$"
+            },
+            "templateId": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "examples": [
+                123345
+              ],
+              "description": "Identifier for this job's template",
+              "exclusiveMinimum": 0
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "shared": {},
+    "cache": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "pipeline": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "job": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": true,
+      "anyOf": [
+        {
+          "required": [
+            "event"
+          ]
+        },
+        {
+          "required": [
+            "pipeline"
+          ]
+        },
+        {
+          "required": [
+            "job"
+          ]
+        }
+      ]
+    },
+    "childPipelines": {
+      "type": "object",
+      "properties": {
+        "scmUrls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$"
+          }
+        },
+        "startAll": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "scmUrls"
+      ],
+      "additionalProperties": false
+    },
+    "stages": {
+      "type": "object",
+      "properties": {
+        "/^[\\w-]+$/": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "jobs": {
+              "type": "array",
+              "minItems": 0,
+              "items": {
+                "type": "string",
+                "maxLength": 100,
+                "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+              }
+            },
+            "setup": {
+              "type": "object",
+              "default": {},
+              "properties": {
+                "annotations": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "blockedBy": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^~([\\w-]+)$"
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^~([\\w-]+)$"
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "cache": {
+                  "type": "boolean"
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "environment": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                },
+                "freezeWindows": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "image": {
+                  "type": "string",
+                  "pattern": "^[^;&|><*?`$()!#'\" ]+$"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  }
+                },
+                "order": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[\\w-]+$"
+                  }
+                },
+                "parameters": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "provider": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "examples": [
+                            "aws"
+                          ],
+                          "description": "Provider name",
+                          "maxLength": 64,
+                          "const": "aws"
+                        },
+                        "region": {
+                          "type": "string",
+                          "examples": [
+                            "us-west-2"
+                          ],
+                          "description": "Region where service and build will run, build region can be overridden",
+                          "default": "us-west-2",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "buildRegion": {
+                          "type": "string",
+                          "examples": [
+                            "us-east-2"
+                          ],
+                          "description": "Region where builds will run if different from service region",
+                          "default": "",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "accountId": {
+                          "examples": [
+                            "123456789012"
+                          ],
+                          "description": "Account ID",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]{12}$",
+                              "maxLength": 12
+                            },
+                            {
+                              "type": "integer",
+                              "minimum": 12
+                            }
+                          ]
+                        },
+                        "vpc": {
+                          "type": "object",
+                          "properties": {
+                            "vpcId": {
+                              "type": "string",
+                              "examples": [
+                                "vpc-1a2b3c4d"
+                              ],
+                              "description": "VPC ID",
+                              "pattern": "^vpc-[\\w]+$",
+                              "maxLength": 128
+                            },
+                            "securityGroupIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "sg-51530134"
+                                ],
+                                "description": "Security group ID",
+                                "pattern": "^sg-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            },
+                            "subnetIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "subnet-01234567890abcdef"
+                                ],
+                                "description": "Subnet ID",
+                                "pattern": "^subnet-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            }
+                          },
+                          "required": [
+                            "vpcId",
+                            "securityGroupIds",
+                            "subnetIds"
+                          ],
+                          "additionalProperties": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "examples": [
+                            "arn:aws:iam::123456789012:role/aws-service-role/amazonaws.com/AWSServiceRole"
+                          ],
+                          "description": "Role ARN",
+                          "pattern": "^arn:aws:iam::\\d{12}:role\\/.+",
+                          "maxLength": 512
+                        },
+                        "executor": {
+                          "type": "string",
+                          "examples": [
+                            "eks"
+                          ],
+                          "description": "Executor name",
+                          "enum": [
+                            "sls",
+                            "eks"
+                          ],
+                          "maxLength": 64
+                        },
+                        "clusterName": {
+                          "type": "string",
+                          "examples": [
+                            "sd-build-eks"
+                          ],
+                          "description": "Cluster name required if executor is eks",
+                          "maxLength": 128
+                        },
+                        "cpuLimit": {
+                          "type": "string",
+                          "examples": [
+                            "2Gi"
+                          ],
+                          "description": "CPU Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "memoryLimit": {
+                          "type": "string",
+                          "examples": [
+                            "4Gi"
+                          ],
+                          "description": "Memory Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "executorLogs": {
+                          "type": "boolean",
+                          "description": "Enable debug logs for executor codebuild",
+                          "default": false
+                        },
+                        "launcherImage": {
+                          "type": "string",
+                          "examples": [
+                            "123456789012.dkr.ecr.us-east-2.amazonaws.com/screwdriver-hub:launcherv6.4"
+                          ],
+                          "description": "Screwdriver launcher image in user Registry"
+                        },
+                        "launcherVersion": {
+                          "type": "string",
+                          "examples": [
+                            "v6.4"
+                          ],
+                          "description": "Screwdriver launcher version"
+                        },
+                        "privilegedMode": {
+                          "type": "boolean",
+                          "description": "Enable privileged mode for container",
+                          "default": false
+                        },
+                        "computeType": {
+                          "type": "string",
+                          "description": "CodeBuild compute type",
+                          "default": "BUILD_GENERAL1_SMALL",
+                          "enum": [
+                            "BUILD_GENERAL1_SMALL",
+                            "BUILD_GENERAL1_LARGE",
+                            "BUILD_GENERAL1_MEDIUM",
+                            "BUILD_GENERAL1_2XLARGE"
+                          ]
+                        },
+                        "environmentType": {
+                          "type": "string",
+                          "description": "CodeBuild environment type",
+                          "default": "LINUX_CONTAINER",
+                          "enum": [
+                            "ARM_CONTAINER",
+                            "LINUX_CONTAINER",
+                            "LINUX_GPU_CONTAINER"
+                          ]
+                        },
+                        "debugSession": {
+                          "type": "boolean",
+                          "description": "Enable debug session inside build container",
+                          "default": false
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$"
+                    }
+                  ]
+                },
+                "secrets": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[A-Z_][A-Z0-9_]*$",
+                    "maxLength": 64
+                  }
+                },
+                "settings": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "sourcePaths": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 1024
+                      }
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 1024
+                    }
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "/^[\\w-]+$/": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "patternProperties": {
+                          "^[\\w-]+$": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "type": "string",
+                  "pattern": "^([\\w/-]+)(?:@((?:(?:\\d+)(?:\\.\\d+)?(?:\\.\\d+)?)|(?:[a-zA-Z][\\w.-]+)))?$"
+                },
+                "templateId": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "examples": [
+                    123345
+                  ],
+                  "description": "Identifier for this job's template",
+                  "exclusiveMinimum": 0
+                },
+                "requires": {
+                  "not": {}
+                }
+              },
+              "additionalProperties": true
+            },
+            "teardown": {
+              "type": "object",
+              "default": {},
+              "properties": {
+                "annotations": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "blockedBy": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^~([\\w-]+)$"
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^~([\\w-]+)$"
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "cache": {
+                  "type": "boolean"
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "environment": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                },
+                "freezeWindows": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "image": {
+                  "type": "string",
+                  "pattern": "^[^;&|><*?`$()!#'\" ]+$"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  }
+                },
+                "order": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[\\w-]+$"
+                  }
+                },
+                "parameters": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "provider": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "examples": [
+                            "aws"
+                          ],
+                          "description": "Provider name",
+                          "maxLength": 64,
+                          "const": "aws"
+                        },
+                        "region": {
+                          "type": "string",
+                          "examples": [
+                            "us-west-2"
+                          ],
+                          "description": "Region where service and build will run, build region can be overridden",
+                          "default": "us-west-2",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "buildRegion": {
+                          "type": "string",
+                          "examples": [
+                            "us-east-2"
+                          ],
+                          "description": "Region where builds will run if different from service region",
+                          "default": "",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "accountId": {
+                          "examples": [
+                            "123456789012"
+                          ],
+                          "description": "Account ID",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]{12}$",
+                              "maxLength": 12
+                            },
+                            {
+                              "type": "integer",
+                              "minimum": 12
+                            }
+                          ]
+                        },
+                        "vpc": {
+                          "type": "object",
+                          "properties": {
+                            "vpcId": {
+                              "type": "string",
+                              "examples": [
+                                "vpc-1a2b3c4d"
+                              ],
+                              "description": "VPC ID",
+                              "pattern": "^vpc-[\\w]+$",
+                              "maxLength": 128
+                            },
+                            "securityGroupIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "sg-51530134"
+                                ],
+                                "description": "Security group ID",
+                                "pattern": "^sg-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            },
+                            "subnetIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "subnet-01234567890abcdef"
+                                ],
+                                "description": "Subnet ID",
+                                "pattern": "^subnet-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            }
+                          },
+                          "required": [
+                            "vpcId",
+                            "securityGroupIds",
+                            "subnetIds"
+                          ],
+                          "additionalProperties": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "examples": [
+                            "arn:aws:iam::123456789012:role/aws-service-role/amazonaws.com/AWSServiceRole"
+                          ],
+                          "description": "Role ARN",
+                          "pattern": "^arn:aws:iam::\\d{12}:role\\/.+",
+                          "maxLength": 512
+                        },
+                        "executor": {
+                          "type": "string",
+                          "examples": [
+                            "eks"
+                          ],
+                          "description": "Executor name",
+                          "enum": [
+                            "sls",
+                            "eks"
+                          ],
+                          "maxLength": 64
+                        },
+                        "clusterName": {
+                          "type": "string",
+                          "examples": [
+                            "sd-build-eks"
+                          ],
+                          "description": "Cluster name required if executor is eks",
+                          "maxLength": 128
+                        },
+                        "cpuLimit": {
+                          "type": "string",
+                          "examples": [
+                            "2Gi"
+                          ],
+                          "description": "CPU Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "memoryLimit": {
+                          "type": "string",
+                          "examples": [
+                            "4Gi"
+                          ],
+                          "description": "Memory Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "executorLogs": {
+                          "type": "boolean",
+                          "description": "Enable debug logs for executor codebuild",
+                          "default": false
+                        },
+                        "launcherImage": {
+                          "type": "string",
+                          "examples": [
+                            "123456789012.dkr.ecr.us-east-2.amazonaws.com/screwdriver-hub:launcherv6.4"
+                          ],
+                          "description": "Screwdriver launcher image in user Registry"
+                        },
+                        "launcherVersion": {
+                          "type": "string",
+                          "examples": [
+                            "v6.4"
+                          ],
+                          "description": "Screwdriver launcher version"
+                        },
+                        "privilegedMode": {
+                          "type": "boolean",
+                          "description": "Enable privileged mode for container",
+                          "default": false
+                        },
+                        "computeType": {
+                          "type": "string",
+                          "description": "CodeBuild compute type",
+                          "default": "BUILD_GENERAL1_SMALL",
+                          "enum": [
+                            "BUILD_GENERAL1_SMALL",
+                            "BUILD_GENERAL1_LARGE",
+                            "BUILD_GENERAL1_MEDIUM",
+                            "BUILD_GENERAL1_2XLARGE"
+                          ]
+                        },
+                        "environmentType": {
+                          "type": "string",
+                          "description": "CodeBuild environment type",
+                          "default": "LINUX_CONTAINER",
+                          "enum": [
+                            "ARM_CONTAINER",
+                            "LINUX_CONTAINER",
+                            "LINUX_GPU_CONTAINER"
+                          ]
+                        },
+                        "debugSession": {
+                          "type": "boolean",
+                          "description": "Enable debug session inside build container",
+                          "default": false
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$"
+                    }
+                  ]
+                },
+                "secrets": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[A-Z_][A-Z0-9_]*$",
+                    "maxLength": 64
+                  }
+                },
+                "settings": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "steps": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "/^[\\w-]+$/": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "patternProperties": {
+                          "^[\\w-]+$": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "type": "string",
+                  "pattern": "^([\\w/-]+)(?:@((?:(?:\\d+)(?:\\.\\d+)?(?:\\.\\d+)?)|(?:[a-zA-Z][\\w.-]+)))?$"
+                },
+                "templateId": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "examples": [
+                    123345
+                  ],
+                  "description": "Identifier for this job's template",
+                  "exclusiveMinimum": 0
+                },
+                "requires": {
+                  "not": {}
+                },
+                "sourcePaths": {
+                  "not": {}
+                }
+              },
+              "additionalProperties": true
+            },
+            "requires": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^~([\\w-]+)$"
+                      },
+                      {
+                        "type": "string",
+                        "maxLength": 100,
+                        "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^~([\\w-]+)$"
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 100,
+                      "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                    }
+                  ]
+                }
+              ]
+            },
+            "sourcePaths": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                {
+                  "type": "string",
+                  "maxLength": 1024
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[\\w-]+$": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "jobs": {
+              "type": "array",
+              "minItems": 0,
+              "items": {
+                "type": "string",
+                "maxLength": 100,
+                "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+              }
+            },
+            "setup": {
+              "type": "object",
+              "default": {},
+              "properties": {
+                "annotations": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "blockedBy": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^~([\\w-]+)$"
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^~([\\w-]+)$"
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "cache": {
+                  "type": "boolean"
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "environment": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                },
+                "freezeWindows": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "image": {
+                  "type": "string",
+                  "pattern": "^[^;&|><*?`$()!#'\" ]+$"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  }
+                },
+                "order": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[\\w-]+$"
+                  }
+                },
+                "parameters": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "provider": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "examples": [
+                            "aws"
+                          ],
+                          "description": "Provider name",
+                          "maxLength": 64,
+                          "const": "aws"
+                        },
+                        "region": {
+                          "type": "string",
+                          "examples": [
+                            "us-west-2"
+                          ],
+                          "description": "Region where service and build will run, build region can be overridden",
+                          "default": "us-west-2",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "buildRegion": {
+                          "type": "string",
+                          "examples": [
+                            "us-east-2"
+                          ],
+                          "description": "Region where builds will run if different from service region",
+                          "default": "",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "accountId": {
+                          "examples": [
+                            "123456789012"
+                          ],
+                          "description": "Account ID",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]{12}$",
+                              "maxLength": 12
+                            },
+                            {
+                              "type": "integer",
+                              "minimum": 12
+                            }
+                          ]
+                        },
+                        "vpc": {
+                          "type": "object",
+                          "properties": {
+                            "vpcId": {
+                              "type": "string",
+                              "examples": [
+                                "vpc-1a2b3c4d"
+                              ],
+                              "description": "VPC ID",
+                              "pattern": "^vpc-[\\w]+$",
+                              "maxLength": 128
+                            },
+                            "securityGroupIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "sg-51530134"
+                                ],
+                                "description": "Security group ID",
+                                "pattern": "^sg-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            },
+                            "subnetIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "subnet-01234567890abcdef"
+                                ],
+                                "description": "Subnet ID",
+                                "pattern": "^subnet-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            }
+                          },
+                          "required": [
+                            "vpcId",
+                            "securityGroupIds",
+                            "subnetIds"
+                          ],
+                          "additionalProperties": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "examples": [
+                            "arn:aws:iam::123456789012:role/aws-service-role/amazonaws.com/AWSServiceRole"
+                          ],
+                          "description": "Role ARN",
+                          "pattern": "^arn:aws:iam::\\d{12}:role\\/.+",
+                          "maxLength": 512
+                        },
+                        "executor": {
+                          "type": "string",
+                          "examples": [
+                            "eks"
+                          ],
+                          "description": "Executor name",
+                          "enum": [
+                            "sls",
+                            "eks"
+                          ],
+                          "maxLength": 64
+                        },
+                        "clusterName": {
+                          "type": "string",
+                          "examples": [
+                            "sd-build-eks"
+                          ],
+                          "description": "Cluster name required if executor is eks",
+                          "maxLength": 128
+                        },
+                        "cpuLimit": {
+                          "type": "string",
+                          "examples": [
+                            "2Gi"
+                          ],
+                          "description": "CPU Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "memoryLimit": {
+                          "type": "string",
+                          "examples": [
+                            "4Gi"
+                          ],
+                          "description": "Memory Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "executorLogs": {
+                          "type": "boolean",
+                          "description": "Enable debug logs for executor codebuild",
+                          "default": false
+                        },
+                        "launcherImage": {
+                          "type": "string",
+                          "examples": [
+                            "123456789012.dkr.ecr.us-east-2.amazonaws.com/screwdriver-hub:launcherv6.4"
+                          ],
+                          "description": "Screwdriver launcher image in user Registry"
+                        },
+                        "launcherVersion": {
+                          "type": "string",
+                          "examples": [
+                            "v6.4"
+                          ],
+                          "description": "Screwdriver launcher version"
+                        },
+                        "privilegedMode": {
+                          "type": "boolean",
+                          "description": "Enable privileged mode for container",
+                          "default": false
+                        },
+                        "computeType": {
+                          "type": "string",
+                          "description": "CodeBuild compute type",
+                          "default": "BUILD_GENERAL1_SMALL",
+                          "enum": [
+                            "BUILD_GENERAL1_SMALL",
+                            "BUILD_GENERAL1_LARGE",
+                            "BUILD_GENERAL1_MEDIUM",
+                            "BUILD_GENERAL1_2XLARGE"
+                          ]
+                        },
+                        "environmentType": {
+                          "type": "string",
+                          "description": "CodeBuild environment type",
+                          "default": "LINUX_CONTAINER",
+                          "enum": [
+                            "ARM_CONTAINER",
+                            "LINUX_CONTAINER",
+                            "LINUX_GPU_CONTAINER"
+                          ]
+                        },
+                        "debugSession": {
+                          "type": "boolean",
+                          "description": "Enable debug session inside build container",
+                          "default": false
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$"
+                    }
+                  ]
+                },
+                "secrets": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[A-Z_][A-Z0-9_]*$",
+                    "maxLength": 64
+                  }
+                },
+                "settings": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "sourcePaths": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 1024
+                      }
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 1024
+                    }
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "/^[\\w-]+$/": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "patternProperties": {
+                          "^[\\w-]+$": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "type": "string",
+                  "pattern": "^([\\w/-]+)(?:@((?:(?:\\d+)(?:\\.\\d+)?(?:\\.\\d+)?)|(?:[a-zA-Z][\\w.-]+)))?$"
+                },
+                "templateId": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "examples": [
+                    123345
+                  ],
+                  "description": "Identifier for this job's template",
+                  "exclusiveMinimum": 0
+                },
+                "requires": {
+                  "not": {}
+                }
+              },
+              "additionalProperties": true
+            },
+            "teardown": {
+              "type": "object",
+              "default": {},
+              "properties": {
+                "annotations": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "blockedBy": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^~([\\w-]+)$"
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^~([\\w-]+)$"
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "cache": {
+                  "type": "boolean"
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "environment": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "object",
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                },
+                "freezeWindows": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "image": {
+                  "type": "string",
+                  "pattern": "^[^;&|><*?`$()!#'\" ]+$"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "/^[A-Z_][A-Z0-9_]*$/": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  }
+                },
+                "order": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[\\w-]+$"
+                  }
+                },
+                "parameters": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "provider": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "examples": [
+                            "aws"
+                          ],
+                          "description": "Provider name",
+                          "maxLength": 64,
+                          "const": "aws"
+                        },
+                        "region": {
+                          "type": "string",
+                          "examples": [
+                            "us-west-2"
+                          ],
+                          "description": "Region where service and build will run, build region can be overridden",
+                          "default": "us-west-2",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "buildRegion": {
+                          "type": "string",
+                          "examples": [
+                            "us-east-2"
+                          ],
+                          "description": "Region where builds will run if different from service region",
+                          "default": "",
+                          "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                          "maxLength": 64
+                        },
+                        "accountId": {
+                          "examples": [
+                            "123456789012"
+                          ],
+                          "description": "Account ID",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]{12}$",
+                              "maxLength": 12
+                            },
+                            {
+                              "type": "integer",
+                              "minimum": 12
+                            }
+                          ]
+                        },
+                        "vpc": {
+                          "type": "object",
+                          "properties": {
+                            "vpcId": {
+                              "type": "string",
+                              "examples": [
+                                "vpc-1a2b3c4d"
+                              ],
+                              "description": "VPC ID",
+                              "pattern": "^vpc-[\\w]+$",
+                              "maxLength": 128
+                            },
+                            "securityGroupIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "sg-51530134"
+                                ],
+                                "description": "Security group ID",
+                                "pattern": "^sg-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            },
+                            "subnetIds": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string",
+                                "examples": [
+                                  "subnet-01234567890abcdef"
+                                ],
+                                "description": "Subnet ID",
+                                "pattern": "^subnet-[\\w]+$",
+                                "maxLength": 128
+                              }
+                            }
+                          },
+                          "required": [
+                            "vpcId",
+                            "securityGroupIds",
+                            "subnetIds"
+                          ],
+                          "additionalProperties": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "examples": [
+                            "arn:aws:iam::123456789012:role/aws-service-role/amazonaws.com/AWSServiceRole"
+                          ],
+                          "description": "Role ARN",
+                          "pattern": "^arn:aws:iam::\\d{12}:role\\/.+",
+                          "maxLength": 512
+                        },
+                        "executor": {
+                          "type": "string",
+                          "examples": [
+                            "eks"
+                          ],
+                          "description": "Executor name",
+                          "enum": [
+                            "sls",
+                            "eks"
+                          ],
+                          "maxLength": 64
+                        },
+                        "clusterName": {
+                          "type": "string",
+                          "examples": [
+                            "sd-build-eks"
+                          ],
+                          "description": "Cluster name required if executor is eks",
+                          "maxLength": 128
+                        },
+                        "cpuLimit": {
+                          "type": "string",
+                          "examples": [
+                            "2Gi"
+                          ],
+                          "description": "CPU Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "memoryLimit": {
+                          "type": "string",
+                          "examples": [
+                            "4Gi"
+                          ],
+                          "description": "Memory Limit for pod in EKS Cluster",
+                          "maxLength": 4
+                        },
+                        "executorLogs": {
+                          "type": "boolean",
+                          "description": "Enable debug logs for executor codebuild",
+                          "default": false
+                        },
+                        "launcherImage": {
+                          "type": "string",
+                          "examples": [
+                            "123456789012.dkr.ecr.us-east-2.amazonaws.com/screwdriver-hub:launcherv6.4"
+                          ],
+                          "description": "Screwdriver launcher image in user Registry"
+                        },
+                        "launcherVersion": {
+                          "type": "string",
+                          "examples": [
+                            "v6.4"
+                          ],
+                          "description": "Screwdriver launcher version"
+                        },
+                        "privilegedMode": {
+                          "type": "boolean",
+                          "description": "Enable privileged mode for container",
+                          "default": false
+                        },
+                        "computeType": {
+                          "type": "string",
+                          "description": "CodeBuild compute type",
+                          "default": "BUILD_GENERAL1_SMALL",
+                          "enum": [
+                            "BUILD_GENERAL1_SMALL",
+                            "BUILD_GENERAL1_LARGE",
+                            "BUILD_GENERAL1_MEDIUM",
+                            "BUILD_GENERAL1_2XLARGE"
+                          ]
+                        },
+                        "environmentType": {
+                          "type": "string",
+                          "description": "CodeBuild environment type",
+                          "default": "LINUX_CONTAINER",
+                          "enum": [
+                            "ARM_CONTAINER",
+                            "LINUX_CONTAINER",
+                            "LINUX_GPU_CONTAINER"
+                          ]
+                        },
+                        "debugSession": {
+                          "type": "boolean",
+                          "description": "Enable debug session inside build container",
+                          "default": false
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$"
+                    }
+                  ]
+                },
+                "secrets": {
+                  "type": "array",
+                  "minItems": 0,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[A-Z_][A-Z0-9_]*$",
+                    "maxLength": 64
+                  }
+                },
+                "settings": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                },
+                "steps": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "/^[\\w-]+$/": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "patternProperties": {
+                          "^[\\w-]+$": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "command"
+                                ],
+                                "additionalProperties": true
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "type": "string",
+                  "pattern": "^([\\w/-]+)(?:@((?:(?:\\d+)(?:\\.\\d+)?(?:\\.\\d+)?)|(?:[a-zA-Z][\\w.-]+)))?$"
+                },
+                "templateId": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "examples": [
+                    123345
+                  ],
+                  "description": "Identifier for this job's template",
+                  "exclusiveMinimum": 0
+                },
+                "requires": {
+                  "not": {}
+                },
+                "sourcePaths": {
+                  "not": {}
+                }
+              },
+              "additionalProperties": true
+            },
+            "requires": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^~([\\w-]+)$"
+                      },
+                      {
+                        "type": "string",
+                        "maxLength": 100,
+                        "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^~([\\w-]+)$"
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 100,
+                      "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                    }
+                  ]
+                }
+              ]
+            },
+            "sourcePaths": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                {
+                  "type": "string",
+                  "maxLength": 1024
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "subscribe": {
+      "type": "object",
+      "properties": {
+        "scmUrls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "/^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$/": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^~([\\w-]+)$"
+                }
+              }
+            },
+            "additionalProperties": true,
+            "patternProperties": {
+              "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^~([\\w-]+)$"
+                }
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "parameters": {
+      "type": "object",
+      "default": {},
+      "properties": {},
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": {
+      "template": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "template"
+    ]
+  },
+  "then": {
+    "properties": {
+      "shared": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "image": {
+            "type": "string",
+            "pattern": "^[^;&|><*?`$()!#'\" ]+$"
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "/^[A-Z_][A-Z0-9_]*$/": {
+                "type": [
+                  "array",
+                  "boolean",
+                  "number",
+                  "object",
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "patternProperties": {
+              "^[A-Z_][A-Z0-9_]*$": {
+                "type": [
+                  "array",
+                  "boolean",
+                  "number",
+                  "object",
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "settings": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true
+          },
+          "requires": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^~([\\w-]+)$"
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 100,
+                      "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                    }
+                  ]
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^~([\\w-]+)$"
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 100,
+                    "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                  }
+                ]
+              }
+            ]
+          },
+          "sourcePaths": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 1024
+                }
+              },
+              {
+                "type": "string",
+                "maxLength": 1024
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "shared": {
+        "type": "object",
+        "default": {},
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true
+          },
+          "blockedBy": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^~([\\w-]+)$"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                    }
+                  ]
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^~([\\w-]+)$"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^~sd@(\\d+):(?:([\\w-]+)|(stage@([\\w-]+):setup))$"
+                  }
+                ]
+              }
+            ]
+          },
+          "cache": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "/^[A-Z_][A-Z0-9_]*$/": {
+                "type": [
+                  "array",
+                  "boolean",
+                  "number",
+                  "object",
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "patternProperties": {
+              "^[A-Z_][A-Z0-9_]*$": {
+                "type": [
+                  "array",
+                  "boolean",
+                  "number",
+                  "object",
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "freezeWindows": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "image": {
+            "type": "string",
+            "pattern": "^[^;&|><*?`$()!#'\" ]+$"
+          },
+          "matrix": {
+            "type": "object",
+            "properties": {
+              "/^[A-Z_][A-Z0-9_]*$/": {
+                "type": "array",
+                "items": {}
+              }
+            },
+            "additionalProperties": false,
+            "patternProperties": {
+              "^[A-Z_][A-Z0-9_]*$": {
+                "type": "array",
+                "items": {}
+              }
+            }
+          },
+          "order": {
+            "type": "array",
+            "minItems": 0,
+            "items": {
+              "type": "string",
+              "pattern": "^[\\w-]+$"
+            }
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "examples": [
+                      "aws"
+                    ],
+                    "description": "Provider name",
+                    "maxLength": 64,
+                    "const": "aws"
+                  },
+                  "region": {
+                    "type": "string",
+                    "examples": [
+                      "us-west-2"
+                    ],
+                    "description": "Region where service and build will run, build region can be overridden",
+                    "default": "us-west-2",
+                    "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                    "maxLength": 64
+                  },
+                  "buildRegion": {
+                    "type": "string",
+                    "examples": [
+                      "us-east-2"
+                    ],
+                    "description": "Region where builds will run if different from service region",
+                    "default": "",
+                    "pattern": "^(us(-gov)?|ap|ca|cn|eu|sa|me)-(central|(north|south)?(east|west)?)-\\d$",
+                    "maxLength": 64
+                  },
+                  "accountId": {
+                    "examples": [
+                      "123456789012"
+                    ],
+                    "description": "Account ID",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9]{12}$",
+                        "maxLength": 12
+                      },
+                      {
+                        "type": "integer",
+                        "minimum": 12
+                      }
+                    ]
+                  },
+                  "vpc": {
+                    "type": "object",
+                    "properties": {
+                      "vpcId": {
+                        "type": "string",
+                        "examples": [
+                          "vpc-1a2b3c4d"
+                        ],
+                        "description": "VPC ID",
+                        "pattern": "^vpc-[\\w]+$",
+                        "maxLength": 128
+                      },
+                      "securityGroupIds": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "string",
+                          "examples": [
+                            "sg-51530134"
+                          ],
+                          "description": "Security group ID",
+                          "pattern": "^sg-[\\w]+$",
+                          "maxLength": 128
+                        }
+                      },
+                      "subnetIds": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "string",
+                          "examples": [
+                            "subnet-01234567890abcdef"
+                          ],
+                          "description": "Subnet ID",
+                          "pattern": "^subnet-[\\w]+$",
+                          "maxLength": 128
+                        }
+                      }
+                    },
+                    "required": [
+                      "vpcId",
+                      "securityGroupIds",
+                      "subnetIds"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "role": {
+                    "type": "string",
+                    "examples": [
+                      "arn:aws:iam::123456789012:role/aws-service-role/amazonaws.com/AWSServiceRole"
+                    ],
+                    "description": "Role ARN",
+                    "pattern": "^arn:aws:iam::\\d{12}:role\\/.+",
+                    "maxLength": 512
+                  },
+                  "executor": {
+                    "type": "string",
+                    "examples": [
+                      "eks"
+                    ],
+                    "description": "Executor name",
+                    "enum": [
+                      "sls",
+                      "eks"
+                    ],
+                    "maxLength": 64
+                  },
+                  "clusterName": {
+                    "type": "string",
+                    "examples": [
+                      "sd-build-eks"
+                    ],
+                    "description": "Cluster name required if executor is eks",
+                    "maxLength": 128
+                  },
+                  "cpuLimit": {
+                    "type": "string",
+                    "examples": [
+                      "2Gi"
+                    ],
+                    "description": "CPU Limit for pod in EKS Cluster",
+                    "maxLength": 4
+                  },
+                  "memoryLimit": {
+                    "type": "string",
+                    "examples": [
+                      "4Gi"
+                    ],
+                    "description": "Memory Limit for pod in EKS Cluster",
+                    "maxLength": 4
+                  },
+                  "executorLogs": {
+                    "type": "boolean",
+                    "description": "Enable debug logs for executor codebuild",
+                    "default": false
+                  },
+                  "launcherImage": {
+                    "type": "string",
+                    "examples": [
+                      "123456789012.dkr.ecr.us-east-2.amazonaws.com/screwdriver-hub:launcherv6.4"
+                    ],
+                    "description": "Screwdriver launcher image in user Registry"
+                  },
+                  "launcherVersion": {
+                    "type": "string",
+                    "examples": [
+                      "v6.4"
+                    ],
+                    "description": "Screwdriver launcher version"
+                  },
+                  "privilegedMode": {
+                    "type": "boolean",
+                    "description": "Enable privileged mode for container",
+                    "default": false
+                  },
+                  "computeType": {
+                    "type": "string",
+                    "description": "CodeBuild compute type",
+                    "default": "BUILD_GENERAL1_SMALL",
+                    "enum": [
+                      "BUILD_GENERAL1_SMALL",
+                      "BUILD_GENERAL1_LARGE",
+                      "BUILD_GENERAL1_MEDIUM",
+                      "BUILD_GENERAL1_2XLARGE"
+                    ]
+                  },
+                  "environmentType": {
+                    "type": "string",
+                    "description": "CodeBuild environment type",
+                    "default": "LINUX_CONTAINER",
+                    "enum": [
+                      "ARM_CONTAINER",
+                      "LINUX_CONTAINER",
+                      "LINUX_GPU_CONTAINER"
+                    ]
+                  },
+                  "debugSession": {
+                    "type": "boolean",
+                    "description": "Enable debug session inside build container",
+                    "default": false
+                  }
+                },
+                "additionalProperties": true
+              },
+              {
+                "type": "string",
+                "pattern": "^(?:(?:https:\\/\\/(?:[^@/:\\s]+@)?)|git@|org-\\d+@)+([^/:\\s]+)(?:\\/|:)([^/:\\s]+)\\/([^\\s]+?)(?:\\.git)(#[^:　\\s]*　[^:　\\s]*|#[^:　\\s]+)?(:[^:　\\s]*　[^:　\\s]*|:[^:　\\s]+)?$"
+              }
+            ]
+          },
+          "requires": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^~([\\w-]+)$"
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 100,
+                      "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                    }
+                  ]
+                }
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^~([\\w-]+)$"
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 100,
+                    "pattern": "^(([\\w-]+)|(?:stage@([\\w-]+):(setup|teardown)))$"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^~?stage@([\\w-]+)(?::([\\w-]+))?$"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^~?sd@\\d+:(?:([\\w-]+)|(stage@([\\w-]+):(setup|teardown)))$"
+                  }
+                ]
+              }
+            ]
+          },
+          "secrets": {
+            "type": "array",
+            "minItems": 0,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z_][A-Z0-9_]*$",
+              "maxLength": 64
+            }
+          },
+          "settings": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true
+          },
+          "sourcePaths": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 1024
+                }
+              },
+              {
+                "type": "string",
+                "maxLength": 1024
+              }
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "/^[\\w-]+$/": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "command": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ],
+                          "additionalProperties": true
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[\\w-]+$": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "command": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ],
+                          "additionalProperties": true
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "template": {
+            "type": "string",
+            "pattern": "^([\\w/-]+)(?:@((?:(?:\\d+)(?:\\.\\d+)?(?:\\.\\d+)?)|(?:[a-zA-Z][\\w.-]+)))?$"
+          },
+          "templateId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "examples": [
+              123345
+            ],
+            "description": "Identifier for this job's template",
+            "exclusiveMinimum": 0
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "jobs"
+    ]
+  }
+}

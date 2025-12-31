@@ -1,0 +1,25 @@
+template: foo/bar@1.0.0
+jobs:
+    main:
+        image: node:25
+        settings:
+            slack: [room_a]
+        environment:
+            BAR: baz
+        requires: []
+        sourcePaths: ["job"]
+    job1:
+        image: node:10
+        settings:
+            slack:
+                channels: [room_b]
+        environment:
+            OTHER: foo
+        annotations:
+            testAnnotation:
+                array: [ bar, baz ]
+                obj:
+                    text: this is a test field
+                    boolean: false
+            screwdriver.cd/buildCluster: test-cluster
+        requires: [main]

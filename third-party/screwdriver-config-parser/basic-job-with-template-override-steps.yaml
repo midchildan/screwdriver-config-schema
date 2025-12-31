@@ -1,0 +1,11 @@
+cache:
+    event: [/tmp/test]
+jobs:
+    main:
+        template: mytemplate@1.2.3
+        steps:
+            - pretest: echo pre-test
+            - test: echo 'my job is overriding this step'
+        requires:
+            - ~pr
+            - ~commit

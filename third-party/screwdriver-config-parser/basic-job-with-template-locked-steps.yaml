@@ -1,0 +1,11 @@
+jobs:
+  main:
+    template: lockedSteps@1
+    steps:
+      - setup: npm audit fix
+      - extra: echo 'not included'
+      - install:
+          command: echo override
+    requires:
+      - ~pr
+      - ~commit
